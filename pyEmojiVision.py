@@ -6,7 +6,7 @@ import plistlib
 
 from collections import Counter
 from PIL import Image, ImageFont, ImageDraw
-from scipy.cluster.vq import kmeans, vq
+from sklearn.cluster import KMeans
 from sklearn.neighbors import KNeighborsClassifier
 from tqdm import tqdm
 
@@ -38,18 +38,15 @@ def getDominantColorFromImage(image, numClusters):
     # arr.size is (width, height, 4 values for RGBA)
     arr = np.asarray(image)
     # arr_reshaped.size is (width * height, 4 values for RGBA)
-    arr_reshaped = arr.reshape(
-        arr.shape[0] * arr.shape[1], arr.shape[2]
-    ).astype(float)
+    arr_reshaped = arr.reshape(arr.shape[0] * arr.shape[1], arr.shape[2])
     # Filter out pixels that have an alpha value under 128 (less than 50% opacity)
     arr_filtered = arr_reshaped[arr_reshaped[:, 3] >= 128]
 
     # Construct color centroids and find the most common centroid,
     # which represents the image's dominant color.
-    color_centroids, distortion = kmeans(arr_filtered, numClusters)
-    centroid_indexes, distortion_values = vq(arr_filtered, color_centroids)
-    most_common_centroid_index = Counter(centroid_indexes).most_common(1)[0][0]
-    dominant_color_vector = color_centroids[most_common_centroid_index]
+    kmeans = KMeans(n_clusters=numClusters).fit(arr_filtered)
+    most_common_centroid_label = Counter(kmeans.labels_).most_common(1)[0][0]
+    dominant_color_vector = kmeans.cluster_centers_[most_common_centroid_label]
     dominant_color_rgba = [int(c) for c in dominant_color_vector]
     return dominant_color_rgba
 
