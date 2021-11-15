@@ -2,7 +2,18 @@
 
 Heavily inspired by [emojivision](https://github.com/gabrieloc/emojivision) and [EmojiVision](https://github.com/ihollander/emoji-vision). Emojis sourced from [DumpEmoji](https://github.com/liuyuning/DumpEmoji/).
 
-```python3
+## Example usage
+
+```sh
+~ python3 pyEmojiVision.py --emojiPlist emojis/Emoji_iOS10.3.1_Simulator_EmojisInCate_1432.plist
+```
+
+Install the required Python modules before running the script.
+```sh
+pip3 install -r requirements.txt
+```
+
+```sh
 ~ python3 pyEmojiVision.py
 usage: pyEmojiVision.py [-h] --emojiPlist EMOJIPLIST [--numClusters NUMCLUSTERS] [--emojiCategory EMOJICATEGORY]
 
