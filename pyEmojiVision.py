@@ -25,9 +25,9 @@ def extractEmojisFromPlist(filepath, parser):
         return emoji_dict
 
 
-def drawEmojiCharToImage(emoji_char, size=(64, 64)):
+def drawEmojiCharToImage(emoji_char, size=(32, 32)):
     img = Image.new("RGBA", size, (0, 0, 0, 0))
-    font = ImageFont.truetype("/System/Library/Fonts/Apple Color Emoji.ttc", 64)
+    font = ImageFont.truetype("/System/Library/Fonts/Apple Color Emoji.ttc", 32)
     draw = ImageDraw.Draw(img)
     draw.text((0, 0), emoji_char, embedded_color=True, font=font)
     # img.show()
