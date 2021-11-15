@@ -7,6 +7,8 @@ import plistlib
 from collections import Counter
 from PIL import Image, ImageFont, ImageDraw
 from scipy.cluster.vq import kmeans, vq
+from sklearn.neighbors import KNeighborsClassifier
+from tqdm import tqdm
 
 
 def extractEmojisFromPlist(filepath, parser):
@@ -82,13 +84,16 @@ def main():
             emoji for categoryEmojis in emojis.values()
             for emoji in categoryEmojis
         ]
-    
-    for e in emojis:
+
+    emoji_dominant_colors = []
+    for e in tqdm(emojis, desc="Building emoji color palette"):
         img = drawEmojiCharToImage(e)
-        # img = drawEmojiCharToImage(emojis[10])
         dominant_color_rgba = getDominantColorFromImage(img, args.numClusters)
-        # print(dominant_color_rgba)
-        # break
+        emoji_dominant_colors.append(dominant_color_rgba)
+
+    emoji_dominant_colors = np.array(emoji_dominant_colors)
+    knn_classifier = KNeighborsClassifier(n_neighbors=1)
+    knn_classifier.fit(emoji_dominant_colors, emojis)
 
 
 if __name__ == "__main__":
