@@ -10,7 +10,7 @@ Heavily inspired by [emojivision](https://github.com/gabrieloc/emojivision) and 
 
 Install the required Python modules before running the script.
 ```sh
-pip3 install -r requirements.txt
+~ pip3 install -r requirements.txt
 ```
 
 ```sh
