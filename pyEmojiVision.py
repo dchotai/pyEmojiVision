@@ -134,7 +134,7 @@ def main():
         dominant_emoji_colors.append(dominant_color_rgba)
 
     dominant_emoji_colors = np.array(dominant_emoji_colors)
-    knn_classifier = KNeighborsClassifier(n_neighbors=9)
+    knn_classifier = KNeighborsClassifier(n_neighbors=1)
     knn_classifier.fit(dominant_emoji_colors, emojis)
 
     for input_file in args.input:
