@@ -11,11 +11,10 @@ from sklearn.neighbors import KNeighborsClassifier
 from tqdm import tqdm
 
 
-def openImageFromFilepath(filepath, parser):
+def validateFilepath(filepath, parser):
     if not os.path.isfile(filepath):
-        parser.error(f"No image found at: {filepath}")
-    img = Image.open(filepath).convert("RGBA")
-    return img
+        parser.error(f"No file found at {filepath}")
+    return filepath
 
 
 def extractEmojisFromPlist(filepath, parser):
@@ -98,7 +97,7 @@ def constructOutputPath(input_path):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "input", nargs="+",
+        "input", nargs="+", type=lambda i: validateFilepath(i, parser),
         help="File path(s) to the input image(s) to convert into emojis. "
         "Output image(s) will be saved to the same location as the input image(s). "
         "Pass in multiple, space-separated file paths to convert multiple images "
@@ -146,7 +145,7 @@ def main():
 
     for input_file in args.input:
         print(f"Processing {os.path.basename(input_file)}")
-        new_image = openImageFromFilepath(input_file, parser)
+        new_image = Image.open(input_file).convert("RGBA")
         downsized_image = downsizeImage(new_image, 16)
         downsized_image_arr = np.asarray(downsized_image).reshape((-1, 4))
         emoji_predictions = knn_classifier.predict(downsized_image_arr)
