@@ -11,6 +11,13 @@ from sklearn.neighbors import KNeighborsClassifier
 from tqdm import tqdm
 
 
+def openImageFromFilepath(filepath, parser):
+    if not os.path.isfile(filepath):
+        parser.error(f"No image found at: {filepath}")
+    img = Image.open(filepath).convert("RGBA")
+    return img
+
+
 def extractEmojisFromPlist(filepath, parser):
     if not(
         os.path.isfile(filepath) and os.path.splitext(filepath)[1] == ".plist"
@@ -51,8 +58,50 @@ def getDominantColorFromImage(image):
     return dominant_color_rgba
 
 
+def downsizeImage(img, scaleFactor):
+    image_size = img.size
+    new_size = (img.size[0] // scaleFactor, img.size[1] // scaleFactor)
+    downsized_image = img.resize(new_size, resample=Image.BILINEAR)
+    return downsized_image
+
+
+def drawEmojiStringToImage(emoji_string, width, height, font_size):
+    img = Image.new("RGB", (width * font_size, height * font_size))
+    # TODO try changing background to dominant color, or compare black with neutral color and alpha
+    # img = Image.new("RGBA", (width * font_size, height * font_size), (0,0,0,0))
+    font = ImageFont.truetype(
+        "/System/Library/Fonts/Apple Color Emoji.ttc", font_size
+    )
+    draw = ImageDraw.Draw(img)
+    draw.text((0, 0), emoji_string, embedded_color=True, font=font, spacing=0)
+    return img
+
+
+def constructOutputPath(input_path):
+    full_input_path = os.path.abspath(os.path.expanduser(input_path))
+    full_input_path_split = os.path.split(full_input_path)
+    output_path = os.path.join(
+        full_input_path_split[0],
+        "_emoji".join(os.path.splitext(full_input_path_split[1]))
+    )
+    # Append a number to the output path to avoid overwriting existing files
+    if os.path.exists(output_path):
+        count = 1
+        output_path_attempt = f" ({count})".join(os.path.splitext(output_path))
+        while os.path.exists(output_path_attempt):
+            count += 1
+            output_path_attempt = f" ({count})".join(os.path.splitext(output_path))
+        output_path = output_path_attempt
+    return output_path
+
+
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "input",
+        help="File path to the input image to convert into emojis. "
+        "The output image will be saved to the same location as the input image."
+    )
     parser.add_argument(
         "--emojiPlist", required=True,
         help="Path to DumpEmoji plist file that contains source emojis grouped into categories. These are the `Emoji_iOS<IOS_VERSION>_Simulator_EmojisInCate_<NUM_EMOJIS>.plist` files found at https://github.com/liuyuning/DumpEmoji/tree/master/Emojis"
@@ -91,6 +140,25 @@ def main():
     emoji_dominant_colors = np.array(emoji_dominant_colors)
     knn_classifier = KNeighborsClassifier(n_neighbors=9)
     knn_classifier.fit(emoji_dominant_colors, emojis)
+
+    # TODO for filepath in args.input:
+    new_image = openImageFromFilepath(args.input, parser)
+    downsized_image = downsizeImage(new_image, 16)
+    downsized_image_arr = np.asarray(downsized_image).reshape((-1, 4))
+    emoji_predictions = knn_classifier.predict(downsized_image_arr)
+
+    width, height = downsized_image.size
+    emoji_string = "".join([
+        "".join(emoji_predictions[(i * width):((i+1) * width)]) + "\n"
+        for i in tqdm(range(height), desc="Constructing rows of emojis")
+    ])
+
+    output_image = drawEmojiStringToImage(
+        emoji_string, width, height, args.emojiSize
+    )
+    output_path = constructOutputPath(args.input)
+    print(f"Saving output to: {output_path}")
+    output_image.save(output_path)
 
 
 if __name__ == "__main__":
