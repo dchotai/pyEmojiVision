@@ -34,7 +34,7 @@ def drawEmojiCharToImage(emoji_char, size=(32, 32)):
     return img
 
 
-def getDominantColorFromImage(image, numClusters):
+def getDominantColorFromImage(image):
     # arr.size is (width, height, 4 values for RGBA)
     arr = np.asarray(image)
     # arr_reshaped.size is (width * height, 4 values for RGBA)
@@ -44,7 +44,7 @@ def getDominantColorFromImage(image, numClusters):
 
     # Construct color centroids and find the most common centroid,
     # which represents the image's dominant color.
-    kmeans = KMeans(n_clusters=numClusters).fit(arr_filtered)
+    kmeans = KMeans(n_clusters=1).fit(arr_filtered)
     most_common_centroid_label = Counter(kmeans.labels_).most_common(1)[0][0]
     dominant_color_vector = kmeans.cluster_centers_[most_common_centroid_label]
     dominant_color_rgba = [int(c) for c in dominant_color_vector]
@@ -58,8 +58,8 @@ def main():
         help="Path to DumpEmoji plist file that contains source emojis grouped into categories. These are the `Emoji_iOS<IOS_VERSION>_Simulator_EmojisInCate_<NUM_EMOJIS>.plist` files found at https://github.com/liuyuning/DumpEmoji/tree/master/Emojis"
     )
     parser.add_argument(
-        "--numClusters", required=False, default=5, type=int,
-        help="Number of clusters to use for finding the dominant color of an emoji using k-means clustering."
+        "--emojiSize", required=False, default=32, const=32, # TODO
+        nargs="?", choices=(20, 32, 64), help="Emoji font size. Default is 32."
     )
     parser.add_argument(
         "--emojiCategory", "--category", required=False,
@@ -84,12 +84,12 @@ def main():
 
     emoji_dominant_colors = []
     for e in tqdm(emojis, desc="Building emoji color palette"):
-        img = drawEmojiCharToImage(e)
-        dominant_color_rgba = getDominantColorFromImage(img, args.numClusters)
+        emoji_img = drawEmojiCharToImage(e)
+        dominant_color_rgba = getDominantColorFromImage(emoji_img)
         emoji_dominant_colors.append(dominant_color_rgba)
 
     emoji_dominant_colors = np.array(emoji_dominant_colors)
-    knn_classifier = KNeighborsClassifier(n_neighbors=1)
+    knn_classifier = KNeighborsClassifier(n_neighbors=9)
     knn_classifier.fit(emoji_dominant_colors, emojis)
 
 
