@@ -2,12 +2,15 @@
 
 Heavily inspired by [emojivision](https://github.com/gabrieloc/emojivision) and [EmojiVision](https://github.com/ihollander/emoji-vision). Emojis sourced from [DumpEmoji](https://github.com/liuyuning/DumpEmoji/).
 
-## Example usage
-
+## Example
 ```sh
 ~ python3 pyEmojiVision.py img/oski.jpeg --emojiPlist emojis/Emoji_iOS10.3.1_Simulator_EmojisInCate_1432.plist
 ```
 
+![Before](./img/oski.jpeg)
+![After](./img/oski_emoji.jpeg)
+
+## Usage
 Install the required Python modules before running the script.
 ```sh
 ~ pip3 install -r requirements.txt
