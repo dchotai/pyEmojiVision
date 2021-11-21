@@ -14,8 +14,13 @@ Install the required Python modules before running the script.
 ```
 
 ```sh
-~ python3 pyEmojiVision.py
-usage: pyEmojiVision.py [-h] --emojiPlist EMOJIPLIST [--numClusters NUMCLUSTERS] [--emojiCategory EMOJICATEGORY]
+~ python3 pyEmojiVision.py -h
+usage: pyEmojiVision.py [-h] --emojiPlist EMOJIPLIST [--emojiSize [{20,32,64}]] [--emojiCategory EMOJICATEGORY] input [input ...]
+
+positional arguments:
+  input                 File path(s) to the input image(s) to convert into emojis. Output image(s) will be saved to the same location as the input
+                        image(s). Pass in multiple, space-separated file paths to convert multiple images at once. For example: `python3 pyEmojiVision.py
+                        imgA.jpeg imgB.jpeg --emojiPlist Emojis.plist`
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -23,8 +28,8 @@ optional arguments:
                         Path to DumpEmoji plist file that contains source emojis grouped into categories. These are the
                         `Emoji_iOS<IOS_VERSION>_Simulator_EmojisInCate_<NUM_EMOJIS>.plist` files found at
                         https://github.com/liuyuning/DumpEmoji/tree/master/Emojis
-  --numClusters NUMCLUSTERS
-                        Number of clusters to use for finding the dominant color of an emoji using k-means clustering.
+  --emojiSize [{20,32,64}]
+                        Emoji font size. Default is 32.
   --emojiCategory EMOJICATEGORY, --category EMOJICATEGORY
                         Category of emojis to be used for generating the output image. If not provided, the default behavior is to use emojis from all
                         categories.
