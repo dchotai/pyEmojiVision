@@ -80,7 +80,7 @@ def constructOutputPath(input_path):
     full_input_path_split = os.path.split(full_input_path)
     output_path = os.path.join(
         full_input_path_split[0],
-        "_emoji".join(os.path.splitext(full_input_path_split[1]))
+        f"{os.path.splitext(full_input_path_split[1])[0]}_emoji.jpg"
     )
     # Append a number to the output path to avoid overwriting existing files
     if os.path.exists(output_path):
