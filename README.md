@@ -10,6 +10,15 @@ Heavily inspired by [emojivision](https://github.com/gabrieloc/emojivision) and 
 ![Before](./img/oski.jpeg)
 ![After](./img/oski_emoji.jpeg)
 
+## How it works
+1. The desired emojis are extracted from the DumpEmoji plist.
+2. Each extracted emoji Unicode character is drawn to a 32x32 image.
+3. The dominant color of each emoji image is found using [k-means clustering](https://en.wikipedia.org/wiki/K-means_clustering). Each dominant color is represented by a list of [RGBA](https://en.wikipedia.org/wiki/RGBA_color_model) values.
+4. A [k-nearest neighbors](https://en.wikipedia.org/wiki/K-nearest_neighbors_algorithm) classifier is created and trained on the dominant emoji colors.
+5. A downsized copy of the input image is created; one downsized pixel represents 16 pixels from the original image.
+6. The classifier predicts the closest dominant emoji color for each downsized pixel's RGBA value.
+7. The emojis corresponding to the predicted dominant emoji colors are drawn to an output image.
+
 ## Usage
 Install the required Python modules before running the script.
 ```sh
