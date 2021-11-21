@@ -15,7 +15,7 @@ Heavily inspired by [emojivision](https://github.com/gabrieloc/emojivision) and 
 2. Each extracted emoji Unicode character is drawn to a 32x32 image.
 3. The dominant color of each emoji image is found using [k-means clustering](https://en.wikipedia.org/wiki/K-means_clustering). Each dominant color is represented by a list of [RGBA](https://en.wikipedia.org/wiki/RGBA_color_model) values.
 4. A [k-nearest neighbors](https://en.wikipedia.org/wiki/K-nearest_neighbors_algorithm) classifier is created and trained on the dominant emoji colors.
-5. A downsized copy of the input image is created; one downsized pixel represents 16 pixels from the original image.
+5. A downsized copy of the input image is created; one downsized pixel represents 20 pixels from the original image.
 6. The classifier predicts the closest dominant emoji color for each downsized pixel's RGBA value.
 7. The emojis corresponding to the predicted dominant emoji colors are drawn to an output image.
 
@@ -27,7 +27,7 @@ Install the required Python modules before running the script.
 
 ```
 ~ python3 pyEmojiVision.py -h
-usage: pyEmojiVision.py [-h] --emojiPlist EMOJIPLIST [--emojiSize [{20,32,64}]] [--emojiCategory EMOJICATEGORY] input [input ...]
+usage: pyEmojiVision.py [-h] --emojiPlist EMOJIPLIST [--emojiCategory EMOJICATEGORY] input [input ...]
 
 positional arguments:
   input                 File path(s) of the input image(s) to convert into emojis. Output image(s) will be saved to the same location as the input
@@ -39,8 +39,6 @@ optional arguments:
                         Path to DumpEmoji plist file that contains source emojis grouped into categories. These are the
                         `Emoji_iOS<IOS_VERSION>_Simulator_EmojisInCate_<NUM_EMOJIS>.plist` files found at
                         https://github.com/liuyuning/DumpEmoji/tree/master/Emojis
-  --emojiSize [{20,32,64}]
-                        Emoji font size. Default is 32.
   --emojiCategory EMOJICATEGORY, --category EMOJICATEGORY
                         Category of emojis to be used for generating the output image. If not provided, the default behavior is to use emojis from all
                         categories.
