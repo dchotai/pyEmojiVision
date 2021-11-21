@@ -98,9 +98,12 @@ def constructOutputPath(input_path):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "input",
-        help="File path to the input image to convert into emojis. "
-        "The output image will be saved to the same location as the input image."
+        "input", nargs="+",
+        help="File path(s) to the input image(s) to convert into emojis. "
+        "Output image(s) will be saved to the same location as the input image(s). "
+        "Pass in multiple, space-separated file paths to convert multiple images "
+        "at once. For example: "
+        "`python3 pyEmojiVision.py imgA.jpeg imgB.jpeg --emojiPlist Emojis.plist`"
     )
     parser.add_argument(
         "--emojiPlist", required=True,
@@ -141,24 +144,24 @@ def main():
     knn_classifier = KNeighborsClassifier(n_neighbors=9)
     knn_classifier.fit(emoji_dominant_colors, emojis)
 
-    # TODO for filepath in args.input:
-    new_image = openImageFromFilepath(args.input, parser)
-    downsized_image = downsizeImage(new_image, 16)
-    downsized_image_arr = np.asarray(downsized_image).reshape((-1, 4))
-    emoji_predictions = knn_classifier.predict(downsized_image_arr)
+    for input_file in args.input:
+        new_image = openImageFromFilepath(input_file, parser)
+        downsized_image = downsizeImage(new_image, 16)
+        downsized_image_arr = np.asarray(downsized_image).reshape((-1, 4))
+        emoji_predictions = knn_classifier.predict(downsized_image_arr)
 
-    width, height = downsized_image.size
-    emoji_string = "".join([
-        "".join(emoji_predictions[(i * width):((i+1) * width)]) + "\n"
-        for i in tqdm(range(height), desc="Constructing rows of emojis")
-    ])
+        width, height = downsized_image.size
+        emoji_string = "".join([
+            "".join(emoji_predictions[(i * width):((i+1) * width)]) + "\n"
+            for i in tqdm(range(height), desc="Constructing rows of emojis")
+        ])
 
-    output_image = drawEmojiStringToImage(
-        emoji_string, width, height, args.emojiSize
-    )
-    output_path = constructOutputPath(args.input)
-    print(f"Saving output to: {output_path}")
-    output_image.save(output_path)
+        output_image = drawEmojiStringToImage(
+            emoji_string, width, height, args.emojiSize
+        )
+        output_path = constructOutputPath(input_file)
+        print(f"Saving output to: {output_path}")
+        output_image.save(output_path)
 
 
 if __name__ == "__main__":
