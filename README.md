@@ -13,14 +13,13 @@ Install the required Python modules before running the script.
 ~ pip3 install -r requirements.txt
 ```
 
-```sh
+```
 ~ python3 pyEmojiVision.py -h
 usage: pyEmojiVision.py [-h] --emojiPlist EMOJIPLIST [--emojiSize [{20,32,64}]] [--emojiCategory EMOJICATEGORY] input [input ...]
 
 positional arguments:
-  input                 File path(s) to the input image(s) to convert into emojis. Output image(s) will be saved to the same location as the input
-                        image(s). Pass in multiple, space-separated file paths to convert multiple images at once. For example: `python3 pyEmojiVision.py
-                        imgA.jpeg imgB.jpeg --emojiPlist Emojis.plist`
+  input                 File path(s) of the input image(s) to convert into emojis. Output image(s) will be saved to the same location as the input
+                        image(s). You can pass in multiple, space-separated file paths to convert multiple images at once.
 
 optional arguments:
   -h, --help            show this help message and exit
