@@ -36,7 +36,6 @@ def drawEmojiCharToImage(emoji_char, size=(32, 32)):
     font = ImageFont.truetype("/System/Library/Fonts/Apple Color Emoji.ttc", 32)
     draw = ImageDraw.Draw(img)
     draw.text((0, 0), emoji_char, embedded_color=True, font=font)
-    # img.show()
     return img
 
 
@@ -66,8 +65,6 @@ def downsizeImage(img, scaleFactor):
 
 def drawEmojiStringToImage(emoji_string, width, height, font_size):
     img = Image.new("RGB", (width * font_size, height * font_size))
-    # TODO try changing background to dominant color, or compare black with neutral color and alpha
-    # img = Image.new("RGBA", (width * font_size, height * font_size), (0,0,0,0))
     font = ImageFont.truetype(
         "/System/Library/Fonts/Apple Color Emoji.ttc", font_size
     )
@@ -98,11 +95,10 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "input", nargs="+", type=lambda i: validateFilepath(i, parser),
-        help="File path(s) to the input image(s) to convert into emojis. "
+        help="File path(s) of the input image(s) to convert into emojis. "
         "Output image(s) will be saved to the same location as the input image(s). "
-        "Pass in multiple, space-separated file paths to convert multiple images "
-        "at once. For example: "
-        "`python3 pyEmojiVision.py imgA.jpeg imgB.jpeg --emojiPlist Emojis.plist`"
+        "You can pass in multiple, space-separated file paths to convert "
+        "multiple images at once."
     )
     parser.add_argument(
         "--emojiPlist", required=True,
@@ -133,15 +129,15 @@ def main():
             for emoji in categoryEmojis
         ]
 
-    emoji_dominant_colors = []
+    dominant_emoji_colors = []
     for e in tqdm(emojis, desc="Building emoji color palette"):
         emoji_img = drawEmojiCharToImage(e)
         dominant_color_rgba = getDominantColorFromImage(emoji_img)
-        emoji_dominant_colors.append(dominant_color_rgba)
+        dominant_emoji_colors.append(dominant_color_rgba)
 
-    emoji_dominant_colors = np.array(emoji_dominant_colors)
+    dominant_emoji_colors = np.array(dominant_emoji_colors)
     knn_classifier = KNeighborsClassifier(n_neighbors=9)
-    knn_classifier.fit(emoji_dominant_colors, emojis)
+    knn_classifier.fit(dominant_emoji_colors, emojis)
 
     for input_file in args.input:
         print(f"Processing {os.path.basename(input_file)}")
