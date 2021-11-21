@@ -5,7 +5,7 @@ Heavily inspired by [emojivision](https://github.com/gabrieloc/emojivision) and 
 ## Example usage
 
 ```sh
-~ python3 pyEmojiVision.py --emojiPlist emojis/Emoji_iOS10.3.1_Simulator_EmojisInCate_1432.plist
+~ python3 pyEmojiVision.py img/oski.jpeg --emojiPlist emojis/Emoji_iOS10.3.1_Simulator_EmojisInCate_1432.plist
 ```
 
 Install the required Python modules before running the script.
