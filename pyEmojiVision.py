@@ -110,7 +110,7 @@ def main():
         help="Path to DumpEmoji plist file that contains source emojis grouped into categories. These are the `Emoji_iOS<IOS_VERSION>_Simulator_EmojisInCate_<NUM_EMOJIS>.plist` files found at https://github.com/liuyuning/DumpEmoji/tree/master/Emojis"
     )
     parser.add_argument(
-        "--emojiSize", required=False, default=32, const=32, # TODO
+        "--emojiSize", required=False, default=32, const=32, type=int,
         nargs="?", choices=(20, 32, 64), help="Emoji font size. Default is 32."
     )
     parser.add_argument(
@@ -145,6 +145,7 @@ def main():
     knn_classifier.fit(emoji_dominant_colors, emojis)
 
     for input_file in args.input:
+        print(f"Processing {os.path.basename(input_file)}")
         new_image = openImageFromFilepath(input_file, parser)
         downsized_image = downsizeImage(new_image, 16)
         downsized_image_arr = np.asarray(downsized_image).reshape((-1, 4))
@@ -153,7 +154,7 @@ def main():
         width, height = downsized_image.size
         emoji_string = "".join([
             "".join(emoji_predictions[(i * width):((i+1) * width)]) + "\n"
-            for i in tqdm(range(height), desc="Constructing rows of emojis")
+            for i in range(height)
         ])
 
         output_image = drawEmojiStringToImage(
