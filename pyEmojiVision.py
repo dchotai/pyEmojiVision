@@ -10,6 +10,8 @@ from sklearn.cluster import KMeans
 from sklearn.neighbors import KNeighborsClassifier
 from tqdm import tqdm
 
+EMOJI_FONT_SIZE = 20
+
 
 def validateFilepath(filepath, parser):
     if not os.path.isfile(filepath):
@@ -63,10 +65,10 @@ def downsizeImage(img, scaleFactor):
     return downsized_image
 
 
-def drawEmojiStringToImage(emoji_string, width, height, font_size):
-    img = Image.new("RGB", (width * font_size, height * font_size))
+def drawEmojiStringToImage(emoji_string, width, height):
+    img = Image.new("RGB", (width * EMOJI_FONT_SIZE, height * EMOJI_FONT_SIZE))
     font = ImageFont.truetype(
-        "/System/Library/Fonts/Apple Color Emoji.ttc", font_size
+        "/System/Library/Fonts/Apple Color Emoji.ttc", EMOJI_FONT_SIZE
     )
     draw = ImageDraw.Draw(img)
     draw.text((0, 0), emoji_string, embedded_color=True, font=font, spacing=0)
@@ -105,10 +107,6 @@ def main():
         help="Path to DumpEmoji plist file that contains source emojis grouped into categories. These are the `Emoji_iOS<IOS_VERSION>_Simulator_EmojisInCate_<NUM_EMOJIS>.plist` files found at https://github.com/liuyuning/DumpEmoji/tree/master/Emojis"
     )
     parser.add_argument(
-        "--emojiSize", required=False, default=32, const=32, type=int,
-        nargs="?", choices=(20, 32, 64), help="Emoji font size. Default is 32."
-    )
-    parser.add_argument(
         "--emojiCategory", "--category", required=False,
         help="Category of emojis to be used for generating the output image. If not provided, the default behavior is to use emojis from all categories."
     )
@@ -142,7 +140,7 @@ def main():
     for input_file in args.input:
         print(f"Processing {os.path.basename(input_file)}")
         new_image = Image.open(input_file).convert("RGBA")
-        downsized_image = downsizeImage(new_image, 16)
+        downsized_image = downsizeImage(new_image, EMOJI_FONT_SIZE)
         downsized_image_arr = np.asarray(downsized_image).reshape((-1, 4))
         emoji_predictions = knn_classifier.predict(downsized_image_arr)
 
@@ -152,9 +150,7 @@ def main():
             for i in range(height)
         ])
 
-        output_image = drawEmojiStringToImage(
-            emoji_string, width, height, args.emojiSize
-        )
+        output_image = drawEmojiStringToImage(emoji_string, width, height)
         output_path = constructOutputPath(input_file)
         print(f"Saving output to: {output_path}")
         output_image.save(output_path)
